@@ -5,13 +5,19 @@ from gsuid_core.models import Event
 from gsuid_core.sv import SV
 
 from ..dna_config.dna_config import DNAConfig
+from ..utils import dna_api
 from ..utils.database.models import DNABind, DNAUser
-from ..utils.msgs.notify import dna_bind_uid_result, dna_login_fail
+from ..utils.msgs.notify import (
+    dna_bind_uid_result,
+    dna_login_fail,
+    send_dna_notify,
+)
 from .login_router import get_cookie, page_login, token_login
 
 sv_dna_login = SV("dna登录")
 sv_dna_bind = SV("dna绑定")
 sv_dna_get_ck = SV("dna获取ck", area="DIRECT")
+sv_dna_logout = SV("dna退出登录")
 
 
 @sv_dna_login.on_command(
@@ -39,6 +45,25 @@ async def dna_login(bot: Bot, ev: Event):
     return await dna_login_fail(bot, ev)
 
 
+@sv_dna_logout.on_fullmatch(("退出登录", "登出", "logout"), block=True)
+async def send_dna_logout_msg(bot: Bot, ev: Event):
+    uid = await DNABind.get_uid_by_game(ev.user_id, ev.bot_id)
+    if not uid:
+        await send_dna_notify(bot, ev, "当前并未登录")
+        return
+    else:
+        await DNABind.delete_uid(ev.user_id, ev.bot_id, uid)
+
+    dna_user = await dna_api.get_dna_user(uid, ev.user_id, ev.bot_id)
+    if not dna_user:
+        await send_dna_notify(bot, ev, "当前并未登录")
+        return
+    else:
+        await DNAUser.delete_cookie(ev.user_id, ev.bot_id, uid)
+
+    await send_dna_notify(bot, ev, "成功退出登录")
+
+
 @sv_dna_bind.on_command(
     (
         "绑定",
@@ -64,7 +89,9 @@ async def send_dna_bind_uid_msg(bot: Bot, ev: Event):
             if len(difference_uid_list) >= max_bind_num:
                 return await dna_bind_uid_result(bot, ev, uid, -4)
 
-        code = await DNABind.insert_uid(qid, ev.bot_id, uid, ev.group_id, lenth_limit=13)
+        code = await DNABind.insert_uid(
+            qid, ev.bot_id, uid, ev.group_id, lenth_limit=13
+        )
         if code == 0 or code == -2:
             retcode = await DNABind.switch_uid_by_game(qid, ev.bot_id, uid)
         return await dna_bind_uid_result(bot, ev, uid, code)

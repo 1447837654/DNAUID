@@ -1,3 +1,8 @@
+from typing import Any, Dict, Literal
+
+from pydantic import BaseModel
+
+
 def get_main_url():
     return "https://dnabbs-api.yingxiong.com"
 
@@ -34,3 +39,24 @@ REPLY_POST_URL = f"{MAIN_URL}/forum/comment/createComment"
 
 # ann
 ANN_LIST_URL = f"{MAIN_URL}/user/mine"
+
+
+class MH_API(BaseModel):
+    url: str
+    method: Literal["GET", "POST"]
+    headers: Dict[str, Any]
+
+
+# 三方mh列表
+MH_LIST = [
+    MH_API(
+        url="https://www.gamekee.com/v1/dna/instanceInfo",
+        method="GET",
+        headers={"game-alias": "dna"},
+    ),
+    MH_API(
+        url="https://wiki.ldmnq.com/v1/dna/instanceInfo",
+        method="GET",
+        headers={"game-alias": "dna"},
+    ),
+]

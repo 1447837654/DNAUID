@@ -104,7 +104,7 @@ class DNALoginService:
 
         msg = []
         for uid in uid_list:
-            dna_user: Optional[DNAUser] = await DNAUser.select_dna_user(
+            dna_user: Optional[DNAUser] = await dna_api.get_dna_user(
                 uid, self.ev.user_id, self.ev.bot_id
             )
             if not dna_user:

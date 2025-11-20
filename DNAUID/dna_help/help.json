@@ -1,0 +1,255 @@
+{
+  "绑定账号": {
+    "desc": "在执行查询之前请绑定账号",
+    "data": [
+      {
+        "name": "绑定UID",
+        "desc": "绑定UID",
+        "eg": "绑定123456",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "切换UID",
+        "desc": "切换绑定的账户",
+        "eg": "切换123456",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "删除UID",
+        "desc": "删除UID",
+        "eg": "删除123456",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "查看UID列表",
+        "desc": "查看UID列表",
+        "eg": "查看",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "删除全部UID",
+        "desc": "查看绑定的UID列表",
+        "eg": "删除全部UID",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "皎皎角登录": {
+    "desc": "在执行查询之前请皎皎角登录",
+    "data": [
+      {
+        "name": "推荐->登录页登录",
+        "desc": "登录页登录",
+        "eg": "登录",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "token登录",
+        "desc": "绑定自己的皎皎角token",
+        "eg": "登录token",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "退出登录",
+        "desc": "退出当前的皎皎角登录",
+        "eg": "退出登录",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "获取绑定的token",
+        "desc": "获取绑定的token",
+        "eg": "获取token",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "密函":{
+    "desc": "密函功能",
+    "data": [
+      {
+        "name": "查看当前密函",
+        "desc": "查看当前密函",
+        "eg": "密函",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "所有密函列表",
+        "desc": "所有密函列表",
+        "eg": "密函列表",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "订阅指定密函推送",
+        "desc": "订阅指定密函推送",
+        "eg": "订阅驱逐密函",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "订阅角色密函推送",
+        "desc": "订阅角色密函推送",
+        "eg": "订阅角色驱逐密函",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "取消订阅密函",
+        "desc": "取消订阅密函",
+        "eg": "取消订阅驱逐密函",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "取消全部订阅密函",
+        "desc": "取消全部订阅密函",
+        "eg": "取消订阅全部密函",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "订阅密函推送周期",
+        "desc": "订阅密函推送周期",
+        "eg": "订阅密函时间17:23",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "我的密函订阅",
+        "desc": "我的密函订阅",
+        "eg": "我的密函",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "信息查询": {
+    "desc": "信息查询功能",
+    "data": [
+      {
+        "name": "基本信息卡片",
+        "desc": "查询基本信息",
+        "eg": "卡片",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "签到服务": {
+    "desc": "该配置项仅针对个人使用",
+    "data": [
+      {
+        "name": "签到",
+        "desc": "签到",
+        "eg": "签到",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "开启自动签到",
+        "desc": "开启每天的自动签到功能",
+        "eg": "开启自动签到",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "关闭自动签到",
+        "desc": "关闭每天的自动签到功能",
+        "eg": "关闭自动签到",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      },
+      {
+        "name": "签到日历",
+        "desc": "签到日历",
+        "eg": "签到日历",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
+      }
+    ]
+  },
+  "群管理员功能": {
+    "pm": 3,
+    "desc": "群管理员功能",
+    "data": [
+      {
+        "name": "订阅公告",
+        "desc": "订阅公告",
+        "eg": "订阅公告",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "取消订阅公告",
+        "desc": "取消订阅公告",
+        "eg": "取消订阅公告",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      }
+    ]
+  },
+  "bot主人功能": {
+    "pm": 1,
+    "desc": "bot主人功能",
+    "data": [
+      {
+        "name": "git更新记录",
+        "desc": "更新记录",
+        "eg": "更新记录",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "全部重新签到",
+        "desc": "全部重新签到所有人",
+        "eg": "全部签到",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      },
+      {
+        "name": "订阅自动签到结果",
+        "desc": "订阅自动签到结果",
+        "eg": "订阅签到结果",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": true
+      }
+    ]
+  }
+}

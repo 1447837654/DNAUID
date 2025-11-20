@@ -1,6 +1,6 @@
-from typing import List, Literal, Optional
+from typing import Any, List, Literal, Optional
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, model_validator
 
 from ..constants.sign_bbs_mark import BBSMarkName
 
@@ -90,8 +90,8 @@ class DNARoleShortNoteRes(BaseModel):
 
 
 class WeaponInsForTool(BaseModel):
-    elementIcon: HttpUrl = Field(description="武器类型图标")
-    icon: HttpUrl = Field(description="武器图标")
+    elementIcon: str = Field(description="武器类型图标")
+    icon: str = Field(description="武器图标")
     level: int = Field(description="武器等级")
     name: str = Field(description="武器名称")
     unLocked: bool = Field(description="是否解锁")
@@ -103,9 +103,9 @@ class WeaponInsForTool(BaseModel):
 class RoleInsForTool(BaseModel):
     charEid: Optional[str] = Field(description="charEid", default=None)
     charId: int = Field(description="charId")
-    elementIcon: HttpUrl = Field(description="元素图标")
+    elementIcon: str = Field(description="元素图标")
     gradeLevel: int = Field(description="命座等级")
-    icon: HttpUrl = Field(description="角色图标")
+    icon: str = Field(description="角色图标")
     level: int = Field(description="角色等级")
     name: str = Field(description="角色名称")
     unLocked: bool = Field(description="是否解锁")
@@ -132,11 +132,20 @@ class RoleInfoForTool(BaseModel):
 
 
 class DNARoleForToolRes(BaseModel):
-    instanceInfo: List[DNARoleForToolInstanceInfo] = Field(description="instanceInfo")
     roleInfo: RoleInfoForTool = Field(description="角色信息")
 
-    def __init__(self, **data):
-        instanceInfo = data.get("instanceInfo", [])
+
+class DNAMHRes(BaseModel):
+    instanceInfo: List[DNARoleForToolInstanceInfo] = Field(description="instanceInfo")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_input(cls, values: Any):
+        # 兼容列表输入
+        if isinstance(values, list):
+            values = {"instanceInfo": values}
+
+        instanceInfo = values.get("instanceInfo", [])
         for index, instance in enumerate(instanceInfo):
             if index == 0:
                 instance["mh_type"] = "role"
@@ -144,7 +153,8 @@ class DNARoleForToolRes(BaseModel):
                 instance["mh_type"] = "weapon"
             elif index == 2:
                 instance["mh_type"] = "mzx"
-        super().__init__(**data)
+
+        return values
 
 
 class RoleAttribute(BaseModel):
@@ -170,13 +180,13 @@ class RoleSkill(BaseModel):
 
 
 class RoleTrace(BaseModel):
-    icon: HttpUrl = Field(description="溯源图标")
+    icon: str = Field(description="溯源图标")
     description: str = Field(description="溯源描述")
 
 
 class Mode(BaseModel):
     id: int = Field(description="id 没佩戴为-1")
-    icon: Optional[HttpUrl] = Field(description="图标")
+    icon: Optional[str] = Field(description="图标")
     quality: Optional[int] = Field(description="质量")
     name: Optional[str] = Field(description="名称")
 
@@ -184,14 +194,14 @@ class Mode(BaseModel):
 class RoleDetail(BaseModel):
     attribute: RoleAttribute = Field(description="角色属性")
     skills: List[RoleSkill] = Field(description="角色技能")
-    paint: HttpUrl = Field(description="立绘")
+    paint: str = Field(description="立绘")
     charName: str = Field(description="角色名称")
-    elementIcon: HttpUrl = Field(description="元素图标")
+    elementIcon: str = Field(description="元素图标")
     traces: List[RoleTrace] = Field(description="溯源")
     currentVolume: int = Field(description="当前魔之楔")
     maxVolume: int = Field(description="最大魔之楔")
     level: int = Field(description="角色等级")
-    icon: HttpUrl = Field(description="角色头像")
+    icon: str = Field(description="角色头像")
     gradeLevel: int = Field(description="溯源等级 0-6")
     elementName: str = Field(description="元素名称")
     modes: List[Mode] = Field(description="mode")

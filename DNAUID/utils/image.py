@@ -14,10 +14,12 @@ from gsuid_core.utils.image.image_tools import (
 )
 
 from .resource.RESOURCE_PATH import (
+    ATTR_PATH,
     AVATAR_PATH,
     CUSTOM_PAINT_PATH,
     PAINT_PATH,
     SKILL_PATH,
+    WEAPON_ATTR_PATH,
     WEAPON_PATH,
 )
 
@@ -37,6 +39,21 @@ COLOR_PERU = (205, 133, 63)  # 秘鲁
 COLOR_CHOCOLATE = (210, 105, 30)  # 巧克力
 COLOR_SADDLE_BROWN = (139, 69, 19)  # 马鞍棕色
 COLOR_SIENNA = (160, 82, 45)  # 赭色
+
+# Red & Pink Tones
+COLOR_LIGHT_SALMON = (255, 160, 122)  # 浅鲑红 / Lightsalmon #FFA07A
+COLOR_SALMON = (250, 128, 114)  # 三文鱼 / Salmon #FA8072
+COLOR_DARK_SALMON = (233, 150, 122)  # 黑鲑 / Dark Salmon #E9967A
+COLOR_LIGHT_CORAL = (240, 128, 128)  # 轻珊瑚 / Light Coral #F08080
+COLOR_INDIAN_RED = (205, 92, 92)  # 印度红 / Indian Red #CD5C5C
+COLOR_CRIMSON = (220, 20, 60)  # 赤红 / Crimson #DC143C
+COLOR_FIRE_BRICK = (178, 34, 34)  # 耐火砖 / Fire Brick #B22222
+COLOR_RED = (255, 0, 0)  # 红色 / Red #FF0000
+COLOR_DARK_RED = (139, 0, 0)  # 深红 / Dark Red #8B0000
+COLOR_MAROON = (128, 0, 0)  # 栗色 / Maroon #800000
+COLOR_TOMATO = (255, 99, 71)  # 番茄 / Tomato #FF6347
+COLOR_ORANGE_RED = (255, 69, 0)  # 橙红 / Orange Red #FF4500
+COLOR_PALE_VIOLET_RED = (219, 112, 147)  # 泛紫红 / Pale Violet Red #DB7093
 
 # Basic Colors
 COLOR_BLACK = (0, 0, 0)
@@ -123,6 +140,48 @@ async def get_weapon_img(
             await download(pic_url, weapon_dir, name, tag="[DNA]")
 
     return Image.open(weapon_path).convert("RGBA")
+
+
+async def get_attr_img(
+    attr_id: Optional[Union[str, int]] = None, pic_url: Optional[str] = None
+) -> Image.Image:
+    if attr_id is None:
+        if pic_url:
+            attr_id = pic_url.split("/")[-1]
+        else:
+            raise ValueError("attr_id 和 pic_url 不能同时为空")
+
+    attr_dir = ATTR_PATH
+    attr_dir.mkdir(parents=True, exist_ok=True)
+
+    name = f"attr_{attr_id}.png"
+    attr_path = attr_dir / name
+    if not attr_path.exists():
+        if pic_url:
+            await download(pic_url, attr_dir, name, tag="[DNA]")
+
+    return Image.open(attr_path).convert("RGBA")
+
+
+async def get_weapon_attr_img(
+    attr_id: Optional[Union[str, int]] = None, pic_url: Optional[str] = None
+) -> Image.Image:
+    if attr_id is None:
+        if pic_url:
+            attr_id = pic_url.split("/")[-1]
+        else:
+            raise ValueError("attr_id 和 pic_url 不能同时为空")
+
+    attr_dir = WEAPON_ATTR_PATH
+    attr_dir.mkdir(parents=True, exist_ok=True)
+
+    name = f"attr_{attr_id}.png"
+    attr_path = attr_dir / name
+    if not attr_path.exists():
+        if pic_url:
+            await download(pic_url, attr_dir, name, tag="[DNA]")
+
+    return Image.open(attr_path).convert("RGBA")
 
 
 async def get_paint_img(

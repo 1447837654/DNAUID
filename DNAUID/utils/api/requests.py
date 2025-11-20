@@ -23,6 +23,7 @@ from .api import (
     LIKE_POST_URL,
     LOGIN_LOG_URL,
     LOGIN_URL,
+    MH_LIST,
     REPLY_POST_URL,
     ROLE_FOR_TOOL_URL,
     ROLE_LIST_URL,
@@ -113,10 +114,36 @@ class DNAApi:
         headers = await get_base_header(dev_code=dev_code, token=token)
         return await self._dna_request(ROLE_LIST_URL, "POST", headers)
 
+    async def get_mh(self):
+        for mh_api in MH_LIST:
+            res = await self._dna_request(
+                url=mh_api.url, method=mh_api.method, header=mh_api.headers
+            )
+            if res.is_success:
+                return res
+
+        dna_user = await self.get_random_dna_user()
+        if not dna_user:
+            return DNAApiResp[Any].err("获取DNA用户失败")
+
+        return await self.get_default_role_for_tool(dna_user.cookie, dna_user.dev_code)
+
     async def get_default_role_for_tool(self, token: str, dev_code: str):
-        headers = await get_base_header(dev_code=dev_code, token=token)
-        data = {"type": 1}
-        return await self._dna_request(ROLE_FOR_TOOL_URL, "POST", headers, data=data)
+        payload = {"type": 1}
+        si = build_signature(payload, token)
+        payload.update({"sign": si["s"], "timestamp": si["t"]})
+        data = urlencode(payload)
+
+        rk = si["k"]
+        pk = await self.get_rsa_public_key()
+        ek = rsa_encrypt(rk, pk)
+        header = await get_base_header(dev_code, token=token)
+
+        if is_h5(header):
+            header.update({"k": ek})
+        else:
+            header.update({"rk": rk, "key": ek})
+        return await self._dna_request(ROLE_FOR_TOOL_URL, "POST", header, data=data)
 
     async def get_short_note_info(self, token: str, dev_code: str):
         headers = await get_base_header(dev_code=dev_code, token=token)

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from ..utils import dna_api
-from ..utils.api.model import DNARoleForToolInstanceInfo, DNARoleForToolRes
+from ..utils.api.model import DNAMHRes, DNARoleForToolInstanceInfo
 
 TEXT_PATH = Path(__file__).parent / "texture2d"
 
@@ -25,17 +25,11 @@ async def get_mh_result(timestamp: int) -> Optional[List[DNARoleForToolInstanceI
         if timestamp == cache["timestamp"]:
             return cache["result"]
 
-        dna_user = await dna_api.get_random_dna_user()
-        if not dna_user:
-            return
-
-        res = await dna_api.get_default_role_for_tool(
-            dna_user.cookie, dna_user.dev_code
-        )
+        res = await dna_api.get_mh()
         if not res.is_success:
             return
 
-        mh_result = DNARoleForToolRes.model_validate(res.data).instanceInfo
+        mh_result = DNAMHRes.model_validate(res.data).instanceInfo
         if not mh_result:
             return
 

@@ -21,6 +21,8 @@ AVATAR_PATH = RESOURCE_PATH / "avatar"  # 头像
 WEAPON_PATH = RESOURCE_PATH / "weapon"  # 武器
 PAINT_PATH = RESOURCE_PATH / "paint"  # 立绘
 SKILL_PATH = RESOURCE_PATH / "skill"  # 技能
+ATTR_PATH = RESOURCE_PATH / "attr"  # 属性
+WEAPON_ATTR_PATH = RESOURCE_PATH / "weapon_attr"  # 武器属性
 
 # 自定义背景图
 CUSTOM_PATH = MAIN_PATH / "custom"
@@ -48,6 +50,7 @@ def init_dir():
         WEAPON_PATH,
         PAINT_PATH,
         SKILL_PATH,
+        ATTR_PATH,
         CUSTOM_PATH,
         CUSTOM_PAINT_PATH,
         ALIAS_PATH,

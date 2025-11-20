@@ -3,7 +3,7 @@ import hashlib
 import secrets
 import time
 import uuid
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 def rsa_encrypt(text: str, public_key_b64: str) -> str:
@@ -17,10 +17,7 @@ def rsa_encrypt(text: str, public_key_b64: str) -> str:
 
     try:
         # 将一行 base64 公钥转 PEM（PKCS#8 公钥）
-        lines = [
-            public_key_b64[i : i + 64]
-            for i in range(0, len(public_key_b64), 64)
-        ]
+        lines = [public_key_b64[i : i + 64] for i in range(0, len(public_key_b64), 64)]
         pem = (
             "-----BEGIN PUBLIC KEY-----\n"
             + "\n".join(lines)
@@ -84,9 +81,11 @@ def xor_encode(text: str, key: str) -> str:
     return "".join(out)
 
 
-def build_signature(data: Dict[str, Any]) -> Dict[str, Any]:
+def build_signature(
+    data: Dict[str, Any], token: Optional[str] = None
+) -> Dict[str, Any]:
     ts = int(time.time() * 1000)
-    sign_data = {**data, "timestamp": ts, "token": None}
+    sign_data = {**data, "timestamp": ts, "token": token}
     sec = rand_str(16)
     sig = sign_fI(sign_data, sec)
     enc = xor_encode(sig, sec)
