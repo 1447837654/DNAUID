@@ -1,6 +1,7 @@
 import random
 from datetime import timedelta
 from pathlib import Path
+from typing import List, Optional
 
 from PIL import Image, ImageDraw
 
@@ -11,7 +12,8 @@ from gsuid_core.utils.image.convert import convert_img
 
 from ..utils import get_datetime
 from ..utils.api.mh_map import get_mh_type_name
-from ..utils.fonts.dna_fonts import dna_font_20, dna_font_25, dna_font_30
+from ..utils.api.model import DNARoleForToolInstanceInfo
+from ..utils.fonts.dna_fonts import dna_font_20, dna_font_36, dna_font_40
 from ..utils.image import (
     COLOR_GOLDENROD,
     COLOR_GREEN,
@@ -40,6 +42,15 @@ async def draw_mh(bot: Bot, ev: Event):
 
     mh_list, _ = await get_mh_subscribe_list(bot, ev, ev.user_id)
 
+    card = await draw_mh_card(mh_result, remaining_seconds, mh_list)
+    return await bot.send(card)
+
+
+async def draw_mh_card(
+    mh_result: List[DNARoleForToolInstanceInfo],
+    remaining_seconds: int,
+    subscribe_list: Optional[List[str]] = None,
+):
     card = Image.open(TEXT_PATH / random.choice(bg_list)).convert("RGBA")
 
     bar_bg = Image.open(TEXT_PATH / "bar.png").convert("RGBA")
@@ -56,20 +67,21 @@ async def draw_mh(bot: Bot, ev: Event):
         for j, ins in enumerate(mh.instances):
             bar_bg_temp = bar_bg.copy()
             bar_bg_draw = ImageDraw.Draw(bar_bg_temp)
-            if (
-                ins.name in mh_list
-                or f"{get_mh_type_name(mh.mh_type)}:{ins.name}" in mh_list
+            if subscribe_list and (
+                ins.name in subscribe_list
+                or f"{get_mh_type_name(mh.mh_type)}:{ins.name}" in subscribe_list
             ):
                 ins_color = COLOR_GREEN
             else:
                 ins_color = COLOR_WHITE
-            bar_bg_draw.text((50, 15), ins.name, ins_color, dna_font_25)
+            # bar_bg_draw.text((70, 10), ins.name, ins_color, dna_font_36)
+            bar_bg_draw.text((180, 27), ins.name, ins_color, dna_font_36, "mm")
 
             mh_card.alpha_composite(bar_bg_temp, (70, j * 80 + 420))
 
         mh_type_name = get_mh_type_name(mh.mh_type)
-        mh_card_draw.text((250, 340), mh_type_name, COLOR_GOLDENROD, dna_font_30, "mm")
-        mh_card_draw.text((250, 375), "当前开放", COLOR_LIGHT_GRAY, dna_font_20, "mm")
+        mh_card_draw.text((250, 350), mh_type_name, COLOR_GOLDENROD, dna_font_40, "mm")
+        mh_card_draw.text((250, 400), "当前开放", COLOR_LIGHT_GRAY, dna_font_20, "mm")
 
         card.alpha_composite(mh_card, (i * 500 + 100, 70))
 
@@ -85,7 +97,7 @@ async def draw_mh(bot: Bot, ev: Event):
 
     card = add_footer(card, 600)
     res = await convert_img(card)
-    await bot.send(res)
+    return res
 
 
 def format_seconds(seconds: int) -> str:

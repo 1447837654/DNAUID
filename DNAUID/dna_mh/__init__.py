@@ -10,10 +10,11 @@ from ..utils import TZ
 from ..utils.api.mh_map import get_mh_list
 from ..utils.msgs.notify import send_dna_notify
 from .draw_mh import draw_mh
+from .push_mh import send_mh_notify
 from .subscribe_mh import (
     get_mh_subscribe,
-    send_mh_notify,
     subscribe_mh,
+    subscribe_mh_pic,
     subscribe_mh_time,
 )
 
@@ -21,6 +22,8 @@ sv_mh = SV("dna密函")
 sv_mh_list = SV("dna密函列表")
 sv_mh_subscribe = SV("dna密函订阅")
 sv_mh_subscribe_cycle = SV("dna密函订阅周期")
+sv_mh_pic_subscribe = SV("dna密函图片订阅", area="GROUP", pm=3)
+sv_mh_test = SV("dna密函测试", pm=0)
 
 RE_MH_LIST = "|".join(get_mh_list()) + "|全部"
 RE_MH_TYPE_LIST = "|".join(["角色", "武器", "魔之楔"])
@@ -91,6 +94,21 @@ async def dna_mh_push_time(bot: Bot, ev: Event):
     await subscribe_mh_time(bot, ev, ev.user_id, start_hour, end_hour)
 
 
+@sv_mh_pic_subscribe.on_fullmatch(
+    (
+        "订阅密函图片",
+        "取消订阅密函图片",
+    ),
+    block=True,
+)
+async def sub_mh_pic_subscribe(bot: Bot, ev: Event):
+    if ev.bot_id != "onebot":
+        logger.warning(f"非onebot禁止订阅密函【{ev.bot_id}】")
+        return
+
+    await subscribe_mh_pic(bot, ev)
+
+
 @sv_mh_subscribe.on_fullmatch(
     (
         "密函订阅",
@@ -113,6 +131,6 @@ async def dna_push_mh_notify():
     await send_mh_notify()
 
 
-# @sv_mh_subscribe.on_fullmatch("密函测试", block=True)
-# async def send_mh_test(bot: Bot, ev: Event):
-#     await send_mh_notify()
+@sv_mh_test.on_fullmatch("密函测试", block=True)
+async def send_mh_test(bot: Bot, ev: Event):
+    await send_mh_notify()

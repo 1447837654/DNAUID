@@ -147,6 +147,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "订阅密函图片",
+        "desc": "订阅密函图片",
+        "eg": "订阅密函图片",
+        "need_ck": false,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
