@@ -76,10 +76,6 @@ class DNAApiResp(BaseModel, Generic[T]):
     @computed_field
     @property
     def is_success(self) -> bool:
-        # 特殊三方apimh
-        if self.msg == "成功" and self.code == 0:
-            return True
-
         return self.success and self.code in (
             RespCode.OK_ZERO,
             RespCode.OK_HTTP,

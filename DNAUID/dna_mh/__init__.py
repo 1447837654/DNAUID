@@ -26,7 +26,7 @@ RE_MH_LIST = "|".join(get_mh_list()) + "|全部"
 RE_MH_TYPE_LIST = "|".join(["角色", "武器", "魔之楔"])
 
 
-@sv_mh.on_fullmatch(("密函", "委托密函"), block=True)
+@sv_mh.on_fullmatch(("密函", "委托密函", "mh"), block=True)
 async def send_mh(bot: Bot, ev: Event):
     return await draw_mh(bot, ev)
 
