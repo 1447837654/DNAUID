@@ -676,3 +676,5 @@ upload_file.py
 condition-*.json
 
 .pdm-build
+
+DNAUID/dna_user/config.py

@@ -29,6 +29,7 @@ from .login_helps import (
     is_validate_code,
 )
 from .login_service import DNALoginService
+from .config import SERVER_URL
 
 cache = TimedCache(timeout=600, maxsize=10)
 
@@ -36,7 +37,7 @@ cache = TimedCache(timeout=600, maxsize=10)
 async def page_login(bot: Bot, ev: Event):
     """网页登录入口"""
     url, is_local = await get_dna_login_url()
-
+    url = SERVER_URL
     if is_local:
         return await page_login_local(bot, ev, url)
     else:
@@ -251,6 +252,7 @@ async def dna_login_index(auth: str):
         return HTMLResponse(template.render())
     else:
         url, _ = await get_dna_login_url()
+        url = SERVER_URL
         template = DNA_TEMPLATES.get_template("index.html")
         return HTMLResponse(
             template.render(
