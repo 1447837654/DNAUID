@@ -162,7 +162,7 @@ class RoleAttribute(BaseModel):
     strongValue: str = Field(description="strongValue")
     skillIntensity: str = Field(description="技能威力")
     weaponTags: List[str] = Field(description="武器精通")
-    defense: int = Field(description="def", alias="防御")
+    defense: int = Field(description="防御", alias="def")
     enmityValue: str = Field(description="enmityValue")
     skillEfficiency: str = Field(description="技能效益")
     skillSustain: str = Field(description="技能耐久")
@@ -186,9 +186,9 @@ class RoleTrace(BaseModel):
 
 class Mode(BaseModel):
     id: int = Field(description="id 没佩戴为-1")
-    icon: Optional[str] = Field(description="图标")
-    quality: Optional[int] = Field(description="质量")
-    name: Optional[str] = Field(description="名称")
+    icon: Optional[str] = Field(description="图标", default=None)
+    quality: Optional[int] = Field(description="质量", default=None)
+    name: Optional[str] = Field(description="名称", default=None)
 
 
 class RoleDetail(BaseModel):
@@ -199,7 +199,7 @@ class RoleDetail(BaseModel):
     elementIcon: str = Field(description="元素图标")
     traces: List[RoleTrace] = Field(description="溯源")
     currentVolume: int = Field(description="当前魔之楔")
-    maxVolume: int = Field(description="最大魔之楔")
+    sumVolume: int = Field(description="最大魔之楔")
     level: int = Field(description="角色等级")
     icon: str = Field(description="角色头像")
     gradeLevel: int = Field(description="溯源等级 0-6")
@@ -275,3 +275,11 @@ class DNATaskProcessRes(BaseModel):
 
     dailyTask: List[DNABBSTask] = Field(description="dailyTask")
     # growTask: List[DNABBSTask] = Field(description="growTask")
+
+
+class WikiDetail(BaseModel):
+    name: str = Field(description="name")
+
+
+class DNAWikiRes(BaseModel):
+    wikis: List[WikiDetail] = Field(description="wikis")

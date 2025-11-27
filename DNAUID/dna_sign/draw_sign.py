@@ -227,7 +227,7 @@ async def draw_sign_calendar(bot: Bot, ev: Event):
         dna_user.cookie, dna_user.dev_code
     )
     if not default_role.is_success:
-        await dna_not_found(bot, ev, "角色信息")
+        await dna_not_found(bot, ev, "角色列表信息")
         return
     default_role = DNARoleForToolRes.model_validate(default_role.data)
     role_show = default_role.roleInfo.roleShow

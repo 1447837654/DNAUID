@@ -55,7 +55,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         dna_user.cookie, dna_user.dev_code
     )
     if not role_for_tool_info.is_success:
-        await dna_not_found(bot, ev, "角色信息")
+        await dna_not_found(bot, ev, "角色列表信息")
         return
     role_for_tool_info = DNARoleForToolRes.model_validate(role_for_tool_info.data)
 

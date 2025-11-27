@@ -22,7 +22,13 @@ WEAPON_PATH = RESOURCE_PATH / "weapon"  # 武器
 PAINT_PATH = RESOURCE_PATH / "paint"  # 立绘
 SKILL_PATH = RESOURCE_PATH / "skill"  # 技能
 ATTR_PATH = RESOURCE_PATH / "attr"  # 属性
+MOD_PATH = RESOURCE_PATH / "mod"  # mod
 WEAPON_ATTR_PATH = RESOURCE_PATH / "weapon_attr"  # 武器属性
+ID2NAME_PATH = RESOURCE_PATH / "id2name.json"  # id2name.json
+# 别名
+ALIAS_PATH = RESOURCE_PATH / "alias"
+CHAR_ALIAS_PATH = ALIAS_PATH / "char_alias.json"  # char_alias.json
+WEAPON_ALIAS_PATH = ALIAS_PATH / "weapon_alias.json"  # weapon_alias.json
 
 # 自定义背景图
 CUSTOM_PATH = MAIN_PATH / "custom"
@@ -32,11 +38,6 @@ CUSTOM_PAINT_PATH = CUSTOM_PATH / "custom_paint"  # 自定义立绘
 OTHER_PATH = MAIN_PATH / "other"
 SIGN_PATH = OTHER_PATH / "sign"
 ANN_CARD_PATH = OTHER_PATH / "ann_card"
-
-# 别名
-ALIAS_PATH = MAIN_PATH / "alias"
-CUSTOM_CHAR_ALIAS_PATH = ALIAS_PATH / "char_alias.json"
-CUSTOM_WEAPON_ALIAS_PATH = ALIAS_PATH / "weapon_alias.json"
 
 
 def init_dir():
@@ -51,6 +52,7 @@ def init_dir():
         PAINT_PATH,
         SKILL_PATH,
         ATTR_PATH,
+        MOD_PATH,
         CUSTOM_PATH,
         CUSTOM_PAINT_PATH,
         ALIAS_PATH,

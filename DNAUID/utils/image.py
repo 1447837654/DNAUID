@@ -17,6 +17,7 @@ from .resource.RESOURCE_PATH import (
     ATTR_PATH,
     AVATAR_PATH,
     CUSTOM_PAINT_PATH,
+    MOD_PATH,
     PAINT_PATH,
     SKILL_PATH,
     WEAPON_ATTR_PATH,
@@ -67,6 +68,15 @@ COLOR_PURPLE = (138, 43, 226)
 
 
 Color = Union[str, Tuple[int, int, int], Tuple[int, int, int, int]]
+
+GRADE_0 = Image.open(TEXT_PATH / "number/0.png")
+GRADE_1 = Image.open(TEXT_PATH / "number/1.png")
+GRADE_2 = Image.open(TEXT_PATH / "number/2.png")
+GRADE_3 = Image.open(TEXT_PATH / "number/3.png")
+GRADE_4 = Image.open(TEXT_PATH / "number/4.png")
+GRADE_5 = Image.open(TEXT_PATH / "number/5.png")
+GRADE_6 = Image.open(TEXT_PATH / "number/6.png")
+grades = [GRADE_0, GRADE_1, GRADE_2, GRADE_3, GRADE_4, GRADE_5, GRADE_6]
 
 
 def get_ICON():
@@ -224,6 +234,25 @@ async def get_custom_paint_img(
                 return True, Image.open(f"{custom_dir}/{path}").convert("RGBA")
 
     return False, await get_paint_img(char_id, pic_url)
+
+
+async def get_mod_img(
+    mod_id: Union[str, int], pic_url: Optional[str] = None
+) -> Image.Image:
+    mod_dir = MOD_PATH
+    mod_dir.mkdir(parents=True, exist_ok=True)
+
+    name = f"mod_{mod_id}.png"
+    mod_path = mod_dir / name
+    if not mod_path.exists():
+        if pic_url:
+            await download(pic_url, mod_dir, name, tag="[DNA]")
+
+    return Image.open(mod_path).convert("RGBA")
+
+
+def get_grade_img(grade_level: int) -> Image.Image:
+    return grades[grade_level]
 
 
 async def get_avatar_title_img(

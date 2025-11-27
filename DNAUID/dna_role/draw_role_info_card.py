@@ -27,6 +27,7 @@ from ..utils.image import (
     get_avatar_img,
     get_avatar_title_img,
     get_dna_bg,
+    get_grade_img,
     get_smooth_drawer,
     get_weapon_attr_img,
     get_weapon_img,
@@ -43,14 +44,6 @@ global_item_mask = Image.open(TEXT_PATH / "item_mask.png")
 global_role_bg = Image.open(TEXT_PATH / "bg/bg1.png")
 global_lang_weapon_bg = Image.open(TEXT_PATH / "bg/bg4.png")
 global_close_weapon_bg = Image.open(TEXT_PATH / "bg/bg5.png")
-GRADE_0 = Image.open(TEXT_PATH / "number/0.png")
-GRADE_1 = Image.open(TEXT_PATH / "number/1.png")
-GRADE_2 = Image.open(TEXT_PATH / "number/2.png")
-GRADE_3 = Image.open(TEXT_PATH / "number/3.png")
-GRADE_4 = Image.open(TEXT_PATH / "number/4.png")
-GRADE_5 = Image.open(TEXT_PATH / "number/5.png")
-GRADE_6 = Image.open(TEXT_PATH / "number/6.png")
-grades = [GRADE_0, GRADE_1, GRADE_2, GRADE_3, GRADE_4, GRADE_5, GRADE_6]
 hang_num = 5
 
 
@@ -79,7 +72,7 @@ async def draw_role_info_card(bot: Bot, ev: Event):
         dna_user.cookie, dna_user.dev_code
     )
     if not default_role.is_success:
-        await dna_not_found(bot, ev, "角色信息")
+        await dna_not_found(bot, ev, "角色列表信息")
         return
 
     default_role = DNARoleForToolRes.model_validate(default_role.data)
@@ -273,7 +266,7 @@ async def _draw_item(
         # 画命座
         if item.grade_level is not None:
             # 当前命座
-            grade_img = grades[item.grade_level]
+            grade_img = get_grade_img(item.grade_level)
             ellipse = Image.new("RGBA", (34, 35))
             get_smooth_drawer().rounded_rectangle(
                 (0, 0, 34, 35), fill=COLOR_FIRE_BRICK, radius=7, target=ellipse

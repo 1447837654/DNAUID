@@ -1,9 +1,9 @@
-from gsuid_core.utils.download_resource.download_core import download_all_file
-
-
 async def download_all_resource():
+    from ...utils.name_convert import refresh_name_convert
 
-    await download_all_file(
-        "DNAUID",
-        {},
-    )
+    await refresh_name_convert()
+
+    # await download_all_file(
+    #     "DNAUID",
+    #     {},
+    # )
