@@ -36,3 +36,7 @@
 ## 致谢
 
 - [Wuyi无疑](https://github.com/KimigaiiWuyi) 
+
+## 攻略组
+
+- [狩月庭攻略组](https://space.bilibili.com/3546915226519877)

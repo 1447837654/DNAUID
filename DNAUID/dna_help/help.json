@@ -176,6 +176,14 @@
         "need_ck": true,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "角色攻略",
+        "desc": "查询角色攻略",
+        "eg": "菲娜攻略",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
