@@ -24,6 +24,7 @@ from .api import (
     LOGIN_LOG_URL,
     LOGIN_URL,
     REPLY_POST_URL,
+    ROLE_DETAIL_URL,
     ROLE_FOR_TOOL_URL,
     ROLE_LIST_URL,
     SHARE_POST_URL,
@@ -136,6 +137,13 @@ class DNAApi:
         else:
             header.update({"rk": rk, "key": ek})
         return await self._dna_request(ROLE_FOR_TOOL_URL, "POST", header, data=data)
+
+    async def get_role_detail(
+        self, token: str, char_id: str, char_eid: str, dev_code: str
+    ):
+        headers = await get_base_header(dev_code=dev_code, token=token)
+        data = {"charId": char_id, "charEid": char_eid, "type": 1}
+        return await self._dna_request(ROLE_DETAIL_URL, "POST", headers, data=data)
 
     async def get_short_note_info(self, token: str, dev_code: str):
         headers = await get_base_header(dev_code=dev_code, token=token)

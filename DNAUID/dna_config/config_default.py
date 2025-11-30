@@ -63,4 +63,20 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         data=["group"],
         options=["private", "group"],
     ),
+    "MHPushSubscribe": GsStrConfig(
+        "密函推送时间设置",
+        "每小时推送一次密函【分钟:秒】，重启生效",
+        "00:30",
+    ),
+    "MHCache": GsBoolConfig(
+        "是否进行密函缓存",
+        "每整点缓存一次，缓存后将不再请求API，直接读取缓存数据",
+        True,
+    ),
+    "Guide": GsListStrConfig(
+        "角色攻略图提供方",
+        "使用DNA角色攻略时选择的提供方",
+        ["all"],
+        options=["all", "狩月庭攻略组"],
+    ),
 }

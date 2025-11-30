@@ -1,76 +1,94 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
-from msgspec import json as msgjson
-
-from gsuid_core.logger import logger
-
+from ..utils.api.model import RoleShowForTool
 from ..utils.resource.RESOURCE_PATH import (
-    CUSTOM_CHAR_ALIAS_PATH,
-    CUSTOM_WEAPON_ALIAS_PATH,
+    CHAR_ALIAS_PATH,
+    ID2NAME_PATH,
+    WEAPON_ALIAS_PATH,
 )
-
-MAP_PATH = Path(__file__).parent / "map"
-ALIAS_LIST = Path(__file__).parent / "alias"
-CHAR_ALIAS = ALIAS_LIST / "char_alias.json"
-WEAPON_ALIAS = ALIAS_LIST / "weapon_alias.json"
 
 char_alias_data: Dict[str, List[str]] = {}
 weapon_alias_data: Dict[str, List[str]] = {}
+id2name_data: Dict[str, str] = {}
 
 
-def add_dictionaries(dict1, dict2):
-    all_keys = set(dict1.keys()) | set(dict2.keys())
-    return {key: list(set(dict1.get(key, []) + dict2.get(key, []))) for key in all_keys}
+async def rebuild_name_convert(role_show: RoleShowForTool, is_force: bool = False):
+    global char_alias_data, weapon_alias_data, id2name_data
+    old_char_alias_data = {} if is_force else _get_alias_data(CHAR_ALIAS_PATH)
+    old_weapon_alias_data = {} if is_force else _get_alias_data(WEAPON_ALIAS_PATH)
+    old_id2name_data = {} if is_force else _get_alias_data(ID2NAME_PATH)
+
+    async def generate_alias_data(
+        metadatas: List[Dict], alias_data: Dict[str, List[str]]
+    ):
+        for meta in metadatas:
+            name = meta["name"]
+            if name not in alias_data or len(alias_data[name]) == 0:
+                alias_data[name] = [name]
+
+    role_metadatas = [{"name": i.name, "id": i.charId} for i in role_show.roleChars]
+    await generate_alias_data(role_metadatas, old_char_alias_data)
+    weapon_metadatas = [
+        {"name": i.name, "id": i.weaponId}
+        for i in role_show.langRangeWeapons + role_show.closeWeapons
+    ]
+    await generate_alias_data(weapon_metadatas, old_weapon_alias_data)
+    old_id2name_data = {
+        str(i["id"]): i["name"] for i in role_metadatas + weapon_metadatas
+    }
+
+    if old_char_alias_data.items() != char_alias_data.items():
+        char_alias_data = old_char_alias_data
+        with open(CHAR_ALIAS_PATH, "w", encoding="utf-8") as f:
+            json.dump(char_alias_data, f, ensure_ascii=False, indent=2)
+    if old_weapon_alias_data.items() != weapon_alias_data.items():
+        weapon_alias_data = old_weapon_alias_data
+        with open(WEAPON_ALIAS_PATH, "w", encoding="utf-8") as f:
+            json.dump(weapon_alias_data, f, ensure_ascii=False, indent=2)
+    if old_id2name_data.items() != id2name_data.items():
+        id2name_data = old_id2name_data
+        with open(ID2NAME_PATH, "w", encoding="utf-8") as f:
+            json.dump(id2name_data, f, ensure_ascii=False, indent=2)
+
+
+async def refresh_name_convert(is_force: bool = False):
+    from ..utils import dna_api
+    from ..utils.api.model import DNARoleForToolRes
+    from ..utils.name_convert import rebuild_name_convert
+
+    dna_user = await dna_api.get_random_dna_user()
+    if not dna_user:
+        return False, "没有可用的DNA用户"
+    role_show = await dna_api.get_default_role_for_tool(
+        dna_user.cookie, dna_user.dev_code
+    )
+    if not role_show.is_success:
+        return False, "获取角色列表信息失败"
+    role_show = DNARoleForToolRes.model_validate(role_show.data)
+    await rebuild_name_convert(role_show.roleInfo.roleShow, is_force=is_force)
+    return True, "别名恢复成功"
+
+
+def _get_alias_data(alias_path: Path):
+    try:
+        data = json.loads(alias_path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        alias_path.write_text("{}", encoding="utf-8")
+        return {}
 
 
 def load_alias_data():
-    global char_alias_data, weapon_alias_data, sonata_alias_data, echo_alias_data
-    with open(CHAR_ALIAS, "r", encoding="UTF-8") as f:
-        char_alias_data = msgjson.decode(f.read(), type=Dict[str, List[str]])
+    global char_alias_data, weapon_alias_data, id2name_data
 
-    with open(WEAPON_ALIAS, "r", encoding="UTF-8") as f:
-        weapon_alias_data = msgjson.decode(f.read(), type=Dict[str, List[str]])
-
-    if CUSTOM_CHAR_ALIAS_PATH.exists():
-        try:
-            with open(CUSTOM_CHAR_ALIAS_PATH, "r", encoding="UTF-8") as f:
-                custom_char_alias_data = msgjson.decode(
-                    f.read(), type=Dict[str, List[str]]
-                )
-        except Exception as e:
-            logger.exception(f"读取自定义角色别名失败 {CUSTOM_CHAR_ALIAS_PATH} - {e}")
-            custom_char_alias_data = {}
-
-        char_alias_data = add_dictionaries(char_alias_data, custom_char_alias_data)
-
-    if CUSTOM_WEAPON_ALIAS_PATH.exists():
-        try:
-            with open(CUSTOM_WEAPON_ALIAS_PATH, "r", encoding="UTF-8") as f:
-                custom_weapon_alias_data = msgjson.decode(
-                    f.read(), type=Dict[str, List[str]]
-                )
-        except Exception as e:
-            logger.exception(f"读取自定义武器别名失败 {CUSTOM_WEAPON_ALIAS_PATH} - {e}")
-            custom_weapon_alias_data = {}
-
-        weapon_alias_data = add_dictionaries(
-            weapon_alias_data, custom_weapon_alias_data
-        )
-
-    with open(CUSTOM_CHAR_ALIAS_PATH, "w", encoding="UTF-8") as f:
-        f.write(json.dumps(char_alias_data, indent=2, ensure_ascii=False))
-
-    with open(CUSTOM_WEAPON_ALIAS_PATH, "w", encoding="UTF-8") as f:
-        f.write(json.dumps(weapon_alias_data, indent=2, ensure_ascii=False))
+    char_alias_data = _get_alias_data(CHAR_ALIAS_PATH)
+    weapon_alias_data = _get_alias_data(WEAPON_ALIAS_PATH)
+    id2name_data = _get_alias_data(ID2NAME_PATH)
 
 
 load_alias_data()
-
-
-with open(MAP_PATH / "id2name.json", "r", encoding="UTF-8") as f:
-    id2name = msgjson.decode(f.read(), type=Dict[str, str])
 
 
 def alias_to_char_name(char_name: Optional[str]) -> Optional[str]:
@@ -89,25 +107,12 @@ def alias_to_char_name_list(char_name: str) -> List[str]:
     return []
 
 
-def char_id_to_char_name(char_id: Union[str, int]) -> Optional[str]:
-    char_id = str(char_id) if isinstance(char_id, int) else char_id
-    if char_id in id2name:
-        return id2name[char_id]
-    else:
-        return None
-
-
 def char_name_to_char_id(char_name: Optional[str]) -> Optional[str]:
-    if not char_name:
-        return None
     char_name = alias_to_char_name(char_name)
-    if not char_name:
-        return None
-    for id, name in id2name.items():
-        if char_name == name:
-            return id
-    else:
-        return None
+    for _id, _name in id2name_data.items():
+        if _name == char_name:
+            return _id
+    return None
 
 
 def alias_to_weapon_name(weapon_name: str) -> str:
@@ -127,18 +132,16 @@ def alias_to_weapon_name(weapon_name: str) -> str:
     return weapon_name
 
 
-def weapon_name_to_weapon_id(weapon_name: str) -> Optional[str]:
-    weapon_name = alias_to_weapon_name(weapon_name)
-    for id, name in id2name.items():
-        if weapon_name == name:
-            return id
-    else:
-        return None
+def alias_to_weapon_name_list(weapon_name: str) -> List[str]:
+    for i in weapon_alias_data:
+        if (weapon_name in i) or (weapon_name in weapon_alias_data[i]):
+            return weapon_alias_data[i]
+    return []
 
 
-def easy_id_to_name(id: str, default: str = "") -> str:
-    return id2name.get(id, default)
+def all_weapon_list() -> List[str]:
+    return list(weapon_alias_data.keys())
 
 
-def get_all_char_id() -> List[str]:
-    return list(id2name.keys())
+def all_char_list() -> List[str]:
+    return list(char_alias_data.keys())

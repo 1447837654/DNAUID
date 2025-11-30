@@ -6,6 +6,7 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.sv import SV
 
+from ..dna_config.dna_config import DNAConfig
 from ..utils import TZ
 from ..utils.api.mh_map import get_mh_list
 from ..utils.msgs.notify import send_dna_notify
@@ -27,6 +28,18 @@ sv_mh_test = SV("dna密函测试", pm=0)
 
 RE_MH_LIST = "|".join(get_mh_list()) + "|全部"
 RE_MH_TYPE_LIST = "|".join(["角色", "武器", "魔之楔"])
+
+MHPUSH_TIME = DNAConfig.get_config("MHPushSubscribe").data
+try:
+    minute, second = MHPUSH_TIME.split(":")
+    int_minute = int(minute)
+    int_second = int(second)
+    if int_minute < 0 or int_minute > 59 or int_second < 0 or int_second > 59:
+        minute = "0"
+        second = "5"
+except ValueError:
+    minute = "0"
+    second = "5"
 
 
 @sv_mh.on_fullmatch(("密函", "委托密函", "mh"), block=True)
@@ -125,8 +138,7 @@ async def send_mh_subscribe(bot: Bot, ev: Event):
     await get_mh_subscribe(bot, ev)
 
 
-# 每小时5秒执行一次密函推送
-@scheduler.scheduled_job("cron", hour="*", minute="0", second="5", timezone=TZ)
+@scheduler.scheduled_job("cron", hour="*", minute=minute, second=second, timezone=TZ)
 async def dna_push_mh_notify():
     await send_mh_notify()
 

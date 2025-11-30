@@ -17,6 +17,7 @@ from .resource.RESOURCE_PATH import (
     ATTR_PATH,
     AVATAR_PATH,
     CUSTOM_PAINT_PATH,
+    MOD_PATH,
     PAINT_PATH,
     SKILL_PATH,
     WEAPON_ATTR_PATH,
@@ -64,6 +65,18 @@ COLOR_RED = (255, 0, 0)
 COLOR_GREEN = (76, 175, 80)
 COLOR_BLUE = (30, 40, 60)
 COLOR_PURPLE = (138, 43, 226)
+
+
+Color = Union[str, Tuple[int, int, int], Tuple[int, int, int, int]]
+
+GRADE_0 = Image.open(TEXT_PATH / "number/0.png")
+GRADE_1 = Image.open(TEXT_PATH / "number/1.png")
+GRADE_2 = Image.open(TEXT_PATH / "number/2.png")
+GRADE_3 = Image.open(TEXT_PATH / "number/3.png")
+GRADE_4 = Image.open(TEXT_PATH / "number/4.png")
+GRADE_5 = Image.open(TEXT_PATH / "number/5.png")
+GRADE_6 = Image.open(TEXT_PATH / "number/6.png")
+grades = [GRADE_0, GRADE_1, GRADE_2, GRADE_3, GRADE_4, GRADE_5, GRADE_6]
 
 
 def get_ICON():
@@ -223,6 +236,25 @@ async def get_custom_paint_img(
     return False, await get_paint_img(char_id, pic_url)
 
 
+async def get_mod_img(
+    mod_id: Union[str, int], pic_url: Optional[str] = None
+) -> Image.Image:
+    mod_dir = MOD_PATH
+    mod_dir.mkdir(parents=True, exist_ok=True)
+
+    name = f"mod_{mod_id}.png"
+    mod_path = mod_dir / name
+    if not mod_path.exists():
+        if pic_url:
+            await download(pic_url, mod_dir, name, tag="[DNA]")
+
+    return Image.open(mod_path).convert("RGBA")
+
+
+def get_grade_img(grade_level: int) -> Image.Image:
+    return grades[grade_level]
+
+
 async def get_avatar_title_img(
     ev: Event,
     uid: str,
@@ -248,10 +280,11 @@ async def get_avatar_title_img(
         "lm",
     )
 
-    draw.rounded_rectangle(
+    get_smooth_drawer().rounded_rectangle(
         (320, 140, 320 + 330, 140 + 40),
         15,
         COLOR_PALE_GOLDENROD,
+        target=img,
     )
 
     draw.text(
@@ -333,6 +366,10 @@ def get_footer():
     return Image.open(TEXT_PATH / "footer.png")
 
 
+def get_div():
+    return Image.open(TEXT_PATH / "div.png")
+
+
 def add_footer(
     img: Image.Image,
     w: int = 0,
@@ -359,6 +396,65 @@ def add_footer(
 
     img.paste(footer, (x, y), footer)
     return img
+
+
+class SmoothDrawer:
+    """通用抗锯齿绘制工具"""
+
+    def __init__(self, scale: int = 4):
+        self.scale = scale
+
+    def rounded_rectangle(
+        self,
+        xy: Union[Tuple[int, int, int, int], Tuple[int, int]],
+        radius: int,
+        fill: Optional[Color] = None,
+        outline: Optional[Color] = None,
+        width: int = 0,
+        target: Optional[Image.Image] = None,
+    ):
+        if len(xy) == 4:
+            # 边界框坐标 (x0, y0, x1, y1)
+            x0, y0, x1, y1 = xy
+            w = abs(x1 - x0)
+            h = abs(y1 - y0)
+            # 如果提供了目标图片，使用边界框的实际坐标
+            paste_x, paste_y = min(x0, x1), min(y0, y1)
+        elif len(xy) == 2:
+            # 尺寸 (width, height) - 向后兼容
+            w, h = xy
+            paste_x, paste_y = 0, 0
+        else:
+            raise ValueError(
+                f"xy 参数必须是 2 或 4 个元素的元组，当前为 {len(xy)} 个元素"
+            )
+
+        if h <= 0 or w <= 0:
+            return
+
+        large = Image.new("RGBA", (w * self.scale, h * self.scale), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(large)
+
+        # 绘制
+        draw.rounded_rectangle(
+            (0, 0, w * self.scale, h * self.scale),
+            radius=radius * self.scale,
+            fill=fill,
+            outline=outline,
+            width=width * self.scale,
+        )
+
+        result = large.resize((w, h))
+
+        if target is not None:
+            target.alpha_composite(result, (paste_x, paste_y))
+            return
+
+        return
+
+
+def get_smooth_drawer(scale: int = 4) -> SmoothDrawer:
+    return SmoothDrawer(scale=scale)
 
 
 def compress_to_webp(

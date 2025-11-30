@@ -100,7 +100,7 @@ async def send_dna_bind_uid_msg(bot: Bot, ev: Event):
         if retcode == 0:
             uid_list = await DNABind.get_uid_list_by_game(qid, ev.bot_id)
             if uid_list:
-                return await dna_bind_uid_result(bot, ev, uid, 1)
+                return await dna_bind_uid_result(bot, ev, uid_list[0], 1)
 
         return await dna_bind_uid_result(bot, ev, uid, -5)
     elif "查看" in ev.command:

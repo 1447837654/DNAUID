@@ -17,6 +17,7 @@ from ..utils.image import (
     COLOR_WHITE,
     add_footer,
     get_avatar_title_img,
+    get_smooth_drawer,
 )
 from ..utils.msgs.notify import (
     dna_not_found,
@@ -27,8 +28,8 @@ from ..utils.msgs.notify import (
 TEXT_PATH = Path(__file__).parent / "texture2d"
 bg_list = ["bg2.jpg", "bg3.jpg", "bg5.jpg"]
 
-running = Image.open(TEXT_PATH / "running.png").convert("RGBA")
-success = Image.open(TEXT_PATH / "success.png").convert("RGBA")
+running = Image.open(TEXT_PATH / "running.png")
+success = Image.open(TEXT_PATH / "success.png")
 
 
 async def draw_stamina_img(bot: Bot, ev: Event):
@@ -54,12 +55,12 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         dna_user.cookie, dna_user.dev_code
     )
     if not role_for_tool_info.is_success:
-        await dna_not_found(bot, ev, "角色信息")
+        await dna_not_found(bot, ev, "角色列表信息")
         return
     role_for_tool_info = DNARoleForToolRes.model_validate(role_for_tool_info.data)
 
     card = Image.open(TEXT_PATH / random.choice(bg_list)).convert("RGBA")
-    fg = Image.open(TEXT_PATH / "fg.png").convert("RGBA")
+    fg = Image.open(TEXT_PATH / "fg.png")
     card.alpha_composite(fg, (0, 0))
 
     role_show = role_for_tool_info.roleInfo.roleShow
@@ -79,10 +80,10 @@ async def draw_stamina_img(bot: Bot, ev: Event):
     card.alpha_composite(avatar_title, (-50, 30))
 
     # div
-    div = Image.open(TEXT_PATH / "div.png").convert("RGBA")
+    div = Image.open(TEXT_PATH / "div.png")
     card.alpha_composite(div, (80, 300))
 
-    bar_bg = Image.open(TEXT_PATH / "bar_bg2.png").convert("RGBA")
+    bar_bg = Image.open(TEXT_PATH / "bar_bg2.png")
     # 便签
     data_list = [
         (
@@ -103,7 +104,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
     ]
 
     for index, data_temp in enumerate(data_list):
-        icon_path = Image.open(TEXT_PATH / f"icon{index + 1}.png").convert("RGBA")
+        icon_path = Image.open(TEXT_PATH / f"icon{index + 1}.png")
 
         bar_bg_temp = bar_bg.copy()
         bar_bg_temp_draw = ImageDraw.Draw(bar_bg_temp)
@@ -122,10 +123,12 @@ async def draw_stamina_img(bot: Bot, ev: Event):
         if progress_per > 1:
             progress_per = 1
 
-        progress = int(150 + 840 * progress_per)
+        progress = int(152 + 837 * progress_per)
 
-        # 进度条 总长度为840
-        bar_bg_temp_draw.rounded_rectangle((150, 70, progress, 90), 10, COLOR_WHITE)
+        # 进度条 总长度为837
+        get_smooth_drawer().rounded_rectangle(
+            (152, 73, progress, 90), 10, COLOR_WHITE, target=bar_bg_temp
+        )
 
         card.alpha_composite(bar_bg_temp, (80, 400 + index * 150))
 
@@ -135,7 +138,7 @@ async def draw_stamina_img(bot: Bot, ev: Event):
     if draft_info and draft_info.draftDoingNum > 0 and draft_info.draftDoingInfo:
         time_now = int(time.time())
         for index, draft in enumerate(draft_info.draftDoingInfo):
-            draft_bg = Image.open(TEXT_PATH / "draft_bg.png").convert("RGBA")
+            draft_bg = Image.open(TEXT_PATH / "draft_bg.png")
             draft_bg_draw = ImageDraw.Draw(draft_bg)
             draft_bg_draw.text(
                 (115, 33), draft.productName, COLOR_WHITE, dna_font_36, "lm"

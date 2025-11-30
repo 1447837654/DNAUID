@@ -27,7 +27,7 @@ async def send_mh_notify():
     now = get_datetime()
     next_refresh = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
     remaining_seconds = int((next_refresh - now).total_seconds())
-    mh_result = await get_mh_result(int(next_refresh.timestamp()))
+    mh_result = await get_mh_result(int(next_refresh.timestamp()), is_force=True)
     if not mh_result:
         logger.warning("未找到有效的密函数据")
         return
