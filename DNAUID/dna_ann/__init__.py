@@ -1,18 +1,18 @@
-import asyncio
 import random
+import asyncio
 from typing import List
 
+from gsuid_core.sv import SV
 from gsuid_core.aps import scheduler
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.subscribe import gs_subscribe
-from gsuid_core.sv import SV
 
-from ..dna_ann.ann_card import ann_detail_card
-from ..dna_config.dna_config import DNAConfig
 from ..utils.dna_api import dna_api
+from ..dna_ann.ann_card import ann_detail_card
 from ..utils.msgs.notify import send_dna_notify
+from ..dna_config.dna_config import DNAConfig
 
 sv_ann = SV("DNA公告")
 sv_ann_sub = SV("订阅DNA公告", pm=3)
@@ -45,7 +45,7 @@ async def sub_ann_dna(bot: Bot, ev: Event):
         logger.debug(f"非onebot禁止订阅二重螺旋公告 【{ev.bot_id}】")
         return
 
-    if ev.group_id is None:
+    if not ev.group_id:
         return await bot.send("请在群聊中订阅")
     if not DNAConfig.get_config("DNAAnnOpen").data:
         return await bot.send("二重螺旋公告推送功能已关闭")
@@ -73,7 +73,7 @@ async def unsub_ann_dna(bot: Bot, ev: Event):
         logger.debug(f"非onebot禁止订阅二重螺旋公告 【{ev.bot_id}】")
         return
 
-    if ev.group_id is None:
+    if not ev.group_id:
         return await bot.send("请在群聊中取消订阅")
 
     data = await gs_subscribe.get_subscribe(task_name_ann)
